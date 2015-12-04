@@ -1,0 +1,20 @@
+Version   400
+Charset "WindowsLatin1"
+Delimiter ","
+CoordSys Earth Projection 1, 62
+Columns 5
+  CName Char(200)
+  CTitle Char(254)
+  CNumber Integer
+  Pubs Smallint
+  _Object Char(25)
+Data
+
+Region  1
+  259
+-149.712289 61.152161
+-149.711995 61.152226
+  Pen (2,26,32768)
+  Brush (59,12637695)
+  Center -149.632204 61.178266
+Region  1
