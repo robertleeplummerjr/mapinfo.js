@@ -10,6 +10,11 @@
 %%
 
 /* COLUMN HANDLING */
+<COLUMN_DECLARATION>[\s\n]+ {/**/}
+<COLUMN_DECLARATION>[A-Za-z]+([\(][0-9]+[\)])? {
+  this.popState();
+  return 'COLUMN_TYPE';
+}
 <COLUMNS>'Data' {
   this.popState();
   this.begin('DATA');
@@ -17,15 +22,12 @@
 <COLUMNS>[0-9]+ {
   return 'COLUMN_NUMBER';
 }
-<COLUMNS>[_A-Za-z]+(?=[ ]+) {
+<COLUMNS>\n\s+ {/**/}
+<COLUMNS>[_A-Za-z][A-Za-z0-9_]+(?=[\s]+) {
   this.begin('COLUMN_DECLARATION');
   return 'COLUMN_NAME';
 }
-<COLUMN_DECLARATION>[A-Za-z]+([\(][0-9]+[\)]) {
-  this.popState();
-  return 'COLUMN_TYPE';
-}
-'Column'[ ](?=[0-9]+) {
+'Columns'[\s](?=[0-9]+) {
   this.begin('COLUMNS');
 }
 
@@ -33,14 +35,14 @@
   this.popState();
   return 'REGION END';
 }
-<REGION_DECLARATION>'Region '(?=[0-9]+[\n]) {
+<REGION_DECLARATION>'Region'[\s]+(?=[0-9]+[\n]) {
   this.popState();
   this.begin('REGION_END');
 }
-<REGION_DECLARATION>[-]?[0-9]+[.]?[0-9]*[ ][-]?[0-9]+[.]?[0-9]*(?=[ \n]) {
+<REGION_DECLARATION>[-]?[0-9]+[.]?[0-9]*[ ][-]?[0-9]+[.]?[0-9]*(?=[\s\n]) {
   return 'LON_LAT';
 }
-<REGION_DECLARATION>[_A-Za-z0-9 \(\),-](?=\n) {
+<REGION_DECLARATION>[_A-Za-z0-9\s\(\),-](?=\n) {
   return 'REGION_PROPERTY';
 }
 <REGION_NUMBER>[0-9]+ {
@@ -48,34 +50,57 @@
   this.begin('REGION_DECLARATION');
   return 'REGION_NUMBER';
 }
-<DATA>'Region'[ ](?=[0-9]+) {
+<DATA>'Region'[\s](?=[0-9]+) {
   this.begin('REGION_NUMBER');
 }
-
-<PROPERTY_VALUE>[A-Za-z\",0-9](?=[\n]) {
+<PROPERTY_VALUE>[\s] {/**/}
+<PROPERTY_VALUE>['][A-Za-z,0-9_\s]+[']?(?=[\n]) {
   this.popState();
   return 'PROPERTY_VALUE';
 }
-<PROPERTY_NAME>[A-Za-z]+ {
+<PROPERTY_VALUE>["][A-Za-z,0-9_\s]+["]?(?=[\n]) {
+  this.popState();
+  return 'PROPERTY_VALUE';
+}
+<PROPERTY_VALUE>[A-Za-z,0-9]+(?=[\n]) {
+  this.popState();
+  return 'PROPERTY_VALUE';
+}
+<PROPERTY_VALUE>['][A-Za-z,0-9_\s]+[']?(?![\n]) {
+  return 'PROPERTY_VALUE';
+}
+<PROPERTY_VALUE>["][A-Za-z,0-9_\s]+["]?(?![\n]) {
+  return 'PROPERTY_VALUE';
+}
+<PROPERTY_VALUE>[A-Za-z,0-9]+(?![\n]) {
+  return 'PROPERTY_VALUE';
+}
+<PROPERTY_NAME>[A-Za-z][A-Za-z0-9]+ {
+  console.log(yytext);
   this.popState();
   this.begin('PROPERTY_VALUE');
   return 'PROPERTY_NAME'
 }
-[\n](?=[A-Za-z]+) {
+[\n](?=[A-Za-z]) {
    this.begin('PROPERTY_NAME');
- }
-<BOF>(?=[A-Za-z]+) {
+}
+<BOF>(?=[A-Za-z]) {
+  this.popState();
   this.begin('PROPERTY_NAME');
 }
+
+\n {/**/}
+\s {/**/}
 
 <BOF> {
   //<BOF>
   this.popState();
+  return;
 }
 
 <<EOF>> {
   //<<EOF>>
-  this.popState();
+  //this.popState();
   //lexer.yy.conditionStack = [];
   return 'EOF';
 }
@@ -88,55 +113,88 @@
 
 %% /* language grammar */
 
-info :
-  properties regions EOF {
+info
+  : properties columnDeclaration regions EOF {
     return {
       properties: $1,
-      regions: $2
+      columns: $2,
+      regions: $3
     };
   }
-	| properties EOF {
-		return {
-		  properties: $1,
-		  regions: []
-		};
-	}
 	| EOF {
 		return null;
 	}
-;
+  ;
 
-properties :
-  properties PROPERTY_NAME PROPERTY_VALUE {
+properties
+  : properties PROPERTY_NAME propertyValues {
     $1.push({
       name: $2,
       value: $3
     });
   }
-  | PROPERTY_NAME PROPERTY_VALUE {
-    return [{
+  | PROPERTY_NAME propertyValues {
+    $$ = [{
       name: $1,
       value: $2
     }];
   }
-;
+  ;
 
-regions :
-  regions regionLines {
+propertyValues
+  : PROPERTY_VALUE
+  {
+    $$ = $1;
+  }
+  | propertyValues PROPERTY_VALUE {
+    if ($1 instanceof Array) {
+      $1.push($2);
+    } else {
+      $$ = [$1, $2];
+    }
+  }
+  ;
+
+columnDeclaration
+  : COLUMN_NUMBER columns {
+    $$ = {
+      index: $1,
+      columns: $2
+    };
+  }
+  ;
+
+columns
+  : COLUMN_NAME COLUMN_TYPE {
+    $$ = [{
+      name: $1,
+      type: $2
+    }];
+  }
+  | columns COLUMN_NAME COLUMN_TYPE {
+    $1.push({
+      name: $2,
+      type: $3
+    });
+  }
+  ;
+
+regions
+  : regions regionLines {
     $1.push($2);
   }
   | REGION_NUMBER regionLines {
-    $1 = [{
+    $$ = [{
       region: $1,
       lines: $2
     }];
   }
-;
+  ;
 
-regionLines :
-  LON_LAT {
+regionLines
+  : LON_LAT {
     var parts = $1.split(' ');
-    $1 = [{
+    $$ = [{
       lon: parts[0],
       lat: parts[1]
     }];
@@ -149,12 +207,12 @@ regionLines :
     });
   }
   | REGION_PROPERTY {
-    $1 = [$1];
+    $$ = [$1];
   }
   | regionLines REGION_PROPERTY {
     $1.push($2);
   }
-;
+  ;
 
 %%
 if (typeof GLOBAL !== 'undefined') {
