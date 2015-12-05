@@ -27,42 +27,61 @@ var MapInfo = (function() {
     toGeoJSON: function() {
       this.parse();
 
-      var mifRegions = this.mif.regions,
-          mifRegion,
-          lines,
-          line,
-          coordinates,
-          features = [],
-          i = 0,
-          iMax =  mifRegions.length,
-          j,
-          jMax;
+      var mifRegions = this.mif.regions
+        , features   = []
+        , i          = 0
+        , iMax       = mifRegions.length
+        , mifRegion
+        , lines
+        , line
+        , coordinates
+        , properties
+        , j
+        , jMax
+        ;
 
       for (; i < iMax; i++) {
         mifRegion  = mifRegions[i];
         lines = mifRegion.lines;
         jMax = lines.length;
         coordinates = [];
+        properties = getGeoJsonProperties(this, i);
         for (j = 0; j < jMax; j++) {
           line = lines[j];
           if (line.hasOwnProperty('lon') && line.hasOwnProperty('lan')) {
             coordinates.push([line.lon, line.lat]);
           }
         }
-        features.push(newPolygon(coordinates));
+        features.push(newPolygon(coordinates, properties));
       }
 
       return newGeoJson(features);
     }
   };
 
-  function newPolygon(coordinates) {
+  function getGeoJsonProperties(self, regionIndex) {
+    var properties = {}
+      , midRow     = self.mid[regionIndex]
+      , columns    = self.mif.columns
+      , i          = 0
+      , max        = columns.length
+      ;
+
+    for (; i < max; i++) {
+      properties[columns[i]] = midRow[i];
+    }
+
+    return properties;
+  }
+
+  function newPolygon(coordinates, properties) {
     return {
       type: "Feature",
       geometry: {
         type: "Polygon",
         coordinates: coordinates
-      }
+      },
+      properties: properties
     }
   }
 
