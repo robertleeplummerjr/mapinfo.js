@@ -1,0 +1,32 @@
+{
+  "name": "mapinfo.js",
+  "version": "0.0.0",
+  "description": "a mapinfo file parser and converter in js",
+  "main": "index.js",
+  "dependencies": {
+    "gulp": "^3.9.0",
+    "jison": "^0.4.15"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robertleeplummerjr/mapinfo.js.git"
+  },
+  "keywords": [
+    "mid",
+    "mif",
+    "mapingo",
+    "geojson",
+    "json",
+    "js"
+  ],
+  "author": "Robert Lee Plummer Jr. <robertleeplummerjr@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/robertleeplummerjr/mapinfo.js/issues"
+  },
+  "homepage": "https://github.com/robertleeplummerjr/mapinfo.js#readme"
+}
