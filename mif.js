@@ -72,12 +72,12 @@
   }
 */
 var parser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,9],$V1=[8,11],$V2=[1,15],$V3=[8,10,11],$V4=[1,18],$V5=[1,19],$V6=[1,23],$V7=[1,24],$V8=[7,17,18],$V9=[13,16];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[1,10],$V2=[1,14],$V3=[1,15],$V4=[9,15],$V5=[1,25],$V6=[1,24],$V7=[9,10,13,15],$V8=[2,9],$V9=[1,26],$Va=[2,14],$Vb=[1,31],$Vc=[1,38],$Vd=[6,9],$Ve=[1,44],$Vf=[8,18],$Vg=[9,20],$Vh=[1,63],$Vi=[1,62],$Vj=[1,68],$Vk=[13,17];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"info":3,"properties":4,"columnDeclaration":5,"regions":6,"EOF":7,"PROPERTY_NAME":8,"propertyValues":9,"PROPERTY_VALUE":10,"COLUMN_NUMBER":11,"columns":12,"COLUMN_NAME":13,"COLUMN_TYPE":14,"regionLines":15,"REGION_NUMBER":16,"LON_LAT":17,"REGION_PROPERTY":18,"$accept":0,"$end":1},
-terminals_: {2:"error",7:"EOF",8:"PROPERTY_NAME",10:"PROPERTY_VALUE",11:"COLUMN_NUMBER",13:"COLUMN_NAME",14:"COLUMN_TYPE",16:"REGION_NUMBER",17:"LON_LAT",18:"REGION_PROPERTY"},
-productions_: [0,[3,4],[3,1],[4,3],[4,2],[9,1],[9,2],[5,2],[12,2],[12,3],[6,2],[6,2],[15,1],[15,2],[15,1],[15,2]],
+symbols_: {"error":2,"info":3,"properties":4,"columns":5,"DATA_START":6,"regions":7,"EOF":8,"NEW_LINE":9,"CONSTANT":10,"propertyValues":11,"STRING":12,"COMMA":13,"INTEGER":14,"COLUMN_START":15,"LEFT_PARENTHESIS":16,"RIGHT_PARENTHESIS":17,"REGION_START":18,"regionLines":19,"REGION_END":20,"FLOAT":21,"args":22,"$accept":0,"$end":1},
+terminals_: {2:"error",6:"DATA_START",8:"EOF",9:"NEW_LINE",10:"CONSTANT",12:"STRING",13:"COMMA",14:"INTEGER",15:"COLUMN_START",16:"LEFT_PARENTHESIS",17:"RIGHT_PARENTHESIS",18:"REGION_START",20:"REGION_END",21:"FLOAT"},
+productions_: [0,[3,5],[3,1],[4,3],[4,4],[11,1],[11,3],[11,1],[11,3],[11,1],[11,2],[11,2],[11,3],[5,3],[5,3],[5,4],[5,6],[5,7],[7,4],[7,5],[19,2],[19,3],[19,3],[19,4],[19,5],[19,6],[19,4],[19,5],[22,1],[22,3],[22,1],[22,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -86,8 +86,8 @@ switch (yystate) {
 case 1:
 
     return {
-      properties: $$[$0-3],
-      columns: $$[$0-2],
+      properties: $$[$0-4],
+      columns: $$[$0-3],
       regions: $$[$0-1]
     };
   
@@ -99,98 +99,155 @@ case 2:
 break;
 case 3:
 
-    $$[$0-2].push({
-      name: $$[$0-1],
-      value: $$[$0]
-    });
+    this.$ = [{
+      name: $$[$0-2],
+      value: $$[$0-1]
+    }];
   
 break;
 case 4:
 
-    this.$ = [{
-      name: $$[$0-1],
-      value: $$[$0]
-    }];
-  
+     $$[$0-3].push({
+       name: $$[$0-1],
+       value: $$[$0]
+     });
+   
 break;
-case 5:
+case 5: case 7: case 9: case 20: case 28: case 30:
 
-    this.$ = $$[$0];
+    this.$ = [$$[$0]];
   
 break;
-case 6:
+case 6: case 8: case 21: case 29: case 31:
 
-    if ($$[$0-1] instanceof Array) {
-      $$[$0-1].push($$[$0]);
-    } else {
-      this.$ = [$$[$0-1], $$[$0]];
-    }
+    $$[$0-2].push($$[$0]);
   
 break;
-case 7:
-
-    this.$ = {
-      index: $$[$0-1],
-      columns: $$[$0]
-    };
-  
-break;
-case 8:
-
-    this.$ = [{
-      name: $$[$0-1],
-      type: $$[$0]
-    }];
-  
-break;
-case 9:
-
-    $$[$0-2].push({
-      name: $$[$0-1],
-      type: $$[$0]
-    });
-  
-break;
-case 10: case 15:
+case 10:
 
     $$[$0-1].push($$[$0]);
   
 break;
 case 11:
 
-    this.$ = [{
-      region: $$[$0-1],
-      lines: $$[$0]
-    }];
+    this.$ = [$$[$0-1], $$[$0]];
   
 break;
 case 12:
 
-    var parts = $$[$0].split(' ');
-    this.$ = [{
-      lon: parts[0],
-      lat: parts[1]
-    }];
+    $$[$0-2].push($$[$0-1]);
+    $$[$0-2].push($$[$0]);
   
 break;
 case 13:
 
-    var parts = $$[$0].split(' ');
-    $$[$0-1].push({
-      lon: parts[0],
-      lat: parts[1]
-    });
+    this.$ = $$[$0];
   
 break;
 case 14:
 
-    this.$ = [$$[$0]];
+    this.$ = [{
+      name: $$[$0-1],
+      type: $$[$0]
+    }];
+  
+break;
+case 15:
+
+    $$[$0-3].push({
+      name: $$[$0-1],
+      type: $$[$0]
+    });
+  
+break;
+case 16:
+
+    this.$ = [{
+      name: $$[$0-4],
+      type: $$[$0-3],
+      definition: $$[$0-1]
+    }];
+  
+break;
+case 17:
+
+    $$[$0-6].push({
+      name: $$[$0-4],
+      type: $$[$0-3],
+      definition: $$[$0-1]
+    });
+  
+break;
+case 18:
+
+    this.$ = [{
+      id: $$[$0-2],
+      lines: $$[$0-1]
+    }];
+  
+break;
+case 19:
+
+    $$[$0-4].push({
+      id: $$[$0-2],
+      lines: $$[$0-1]
+    });
+  
+break;
+case 22:
+
+    this.$ = [{
+      lon: $$[$0-1],
+      lat: $$[$0]
+    }];
+  
+break;
+case 23:
+
+    $$[$0-3].push({
+      lon: $$[$0-1],
+      lat: $$[$0]
+    });
+  
+break;
+case 24:
+
+    this.$ = [{
+      key: $$[$0-3],
+      args: $$[$0-1]
+    }];
+  
+break;
+case 25:
+
+    $$[$0-5].push({
+      key: $$[$0-3],
+      value: $$[$0-1]
+    });
+  
+break;
+case 26:
+
+    this.$ = [{
+      key: $$[$0-2],
+      lat: $$[$0-1],
+      lon: $$[$0]
+    }];
+  
+break;
+case 27:
+
+    $$[$0-4].push({
+      key: $$[$0-2],
+      lat: $$[$0-1],
+      lon: $$[$0]
+    });
   
 break;
 }
 },
-table: [{3:1,4:2,7:[1,3],8:[1,4]},{1:[3]},{5:5,8:[1,6],11:[1,7]},{1:[2,2]},{9:8,10:$V0},{6:10,16:[1,11]},{9:12,10:$V0},{12:13,13:[1,14]},o($V1,[2,4],{10:$V2}),o($V3,[2,5]),{7:[1,16],15:17,17:$V4,18:$V5},{15:20,17:$V4,18:$V5},o($V1,[2,3],{10:$V2}),{13:[1,21],16:[2,7]},{14:[1,22]},o($V3,[2,6]),{1:[2,1]},{7:[2,10],17:$V6,18:$V7},o($V8,[2,12]),o($V8,[2,14]),{7:[2,11],17:$V6,18:$V7},{14:[1,25]},o($V9,[2,8]),o($V8,[2,13]),o($V8,[2,15]),o($V9,[2,9])],
-defaultActions: {3:[2,2],16:[2,1]},
+table: [{3:1,4:2,8:[1,3],9:[1,4]},{1:[3]},{5:5,9:[1,6],15:$V0},{1:[2,2]},{10:[1,8]},{6:[1,9],9:$V1},{10:[1,11]},{14:[1,12]},{10:[1,16],11:13,12:$V2,14:$V3},{7:17,18:[1,18]},{10:[1,19]},{10:[1,21],11:20,12:$V2,14:$V3},{5:22,9:[1,23],15:$V0},o($V4,[2,3],{10:$V5,13:$V6}),o($V7,[2,5]),o($V7,[2,7]),o($V7,$V8,{14:$V9}),{8:[1,27],18:[1,28]},{14:[1,29]},{10:[1,30]},o($V4,[2,4],{10:$V5,13:$V6}),o([10,13,15],$V8,{6:$Va,9:$Va,14:$V9,16:$Vb}),{6:[2,13],9:$V1},{10:[1,32]},{12:[1,33],14:[1,34]},o($V7,[2,10],{14:[1,35]}),o($V7,[2,11]),{1:[2,1]},{14:[1,36]},{9:$Vc,19:37},o($Vd,[2,15],{16:[1,39]}),{14:[1,40]},{10:[1,41]},o($V7,[2,6]),o($V7,[2,8]),o($V7,[2,12]),{9:$Vc,19:42},{9:$Ve,20:[1,43]},{10:[1,47],14:[1,45],21:[1,46]},{14:[1,48]},{17:[1,49]},o($Vd,$Va,{16:$Vb}),{9:$Ve,20:[1,50]},o($Vf,[2,18]),{10:[1,53],14:[1,51],21:[1,52]},o($Vg,[2,20]),{21:[1,54]},{16:[1,55],21:[1,56]},{17:[1,57]},o($Vd,[2,16]),o($Vf,[2,19]),o($Vg,[2,21]),{21:[1,58]},{16:[1,59],21:[1,60]},o($Vg,[2,22]),{14:$Vh,21:$Vi,22:61},{21:[1,64]},o($Vd,[2,17]),o($Vg,[2,23]),{14:$Vh,21:$Vi,22:65},{21:[1,66]},{13:$Vj,17:[1,67]},o($Vk,[2,28]),o($Vk,[2,30]),o($Vg,[2,26]),{13:$Vj,17:[1,69]},o($Vg,[2,27]),o($Vg,[2,24]),{14:[1,71],21:[1,70]},o($Vg,[2,25]),o($Vk,[2,29]),o($Vk,[2,31])],
+defaultActions: {3:[2,2],27:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -698,127 +755,79 @@ options: {},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0:/**/
+case 0:
+  //<BOF>
+  this.popState();
+  return 9;
+
 break;
 case 1:
-  this.popState();
-  return 14;
+  return 10;
 
 break;
 case 2:
-  this.popState();
-  this.begin('DATA');
+  return 12;
 
 break;
 case 3:
-  return 11;
+  return 12;
 
 break;
-case 4:/**/
+case 4:
+  return 15;
+
 break;
 case 5:
-  this.begin('COLUMN_DECLARATION');
-  return 13;
+  return 6;
 
 break;
 case 6:
-  this.begin('COLUMNS');
+  this.popState();
+  return 20;
 
 break;
 case 7:
-  this.popState();
-  return 'REGION END';
-
-break;
-case 8:
-  this.popState();
-  this.begin('REGION_END');
-
-break;
-case 9:
-  return 17;
-
-break;
-case 10:
+  this.begin('REGION');
   return 18;
 
 break;
-case 11:
-  this.popState();
-  this.begin('REGION_DECLARATION');
+case 8:
+  return 21;
+
+break;
+case 9:
+  return 14;
+
+break;
+case 10:
   return 16;
 
 break;
+case 11:
+  return 17;
+
+break;
 case 12:
-  this.begin('REGION_NUMBER');
+  return 13;
 
 break;
-case 13:/**/
-break;
-case 14:
-  this.popState();
-  return 10;
+case 13:
+  return 9;
 
+break;
+case 14:/**/
 break;
 case 15:
-  this.popState();
-  return 10;
-
-break;
-case 16:
-  this.popState();
-  return 10;
-
-break;
-case 17:
-  return 10;
-
-break;
-case 18:
-  return 10;
-
-break;
-case 19:
-  return 10;
-
-break;
-case 20:
-  console.log(yy_.yytext);
-  this.popState();
-  this.begin('PROPERTY_VALUE');
-  return 8
-
-break;
-case 21:
-   this.begin('PROPERTY_NAME');
-
-break;
-case 22:
-  this.popState();
-  this.begin('PROPERTY_NAME');
-
-break;
-case 23:/**/
-break;
-case 24:/**/
-break;
-case 25:
-  //<BOF>
-  this.popState();
-  return;
-
-break;
-case 26:
   //<<EOF>>
   //this.popState();
   //lexer.yy.conditionStack = [];
-  return 7;
+  return 8;
 
 break;
 }
 },
-rules: [/^(?:[\s\n]+)/,/^(?:[A-Za-z]+([\(][0-9]+[\)])?)/,/^(?:Data\b)/,/^(?:[0-9]+)/,/^(?:\n\s+)/,/^(?:[_A-Za-z][A-Za-z0-9_]+(?=[\s]+))/,/^(?:Columns[\s](?=[0-9]+))/,/^(?:[0-9]+)/,/^(?:Region[\s]+(?=[0-9]+[\n]))/,/^(?:[-]?[0-9]+[.]?[0-9]*[ ][-]?[0-9]+[.]?[0-9]*(?=[\s\n]))/,/^(?:[_A-Za-z0-9\s\(\),-](?=\n))/,/^(?:[0-9]+)/,/^(?:Region[\s](?=[0-9]+))/,/^(?:[\s])/,/^(?:['][A-Za-z,0-9_\s]+[']?(?=[\n]))/,/^(?:["][A-Za-z,0-9_\s]+["]?(?=[\n]))/,/^(?:[A-Za-z,0-9]+(?=[\n]))/,/^(?:['][A-Za-z,0-9_\s]+[']?(?![\n]))/,/^(?:["][A-Za-z,0-9_\s]+["]?(?![\n]))/,/^(?:[A-Za-z,0-9]+(?![\n]))/,/^(?:[A-Za-z][A-Za-z0-9]+)/,/^(?:[\n](?=[A-Za-z]))/,/^(?:(?=[A-Za-z]))/,/^(?:\n)/,/^(?:\s)/,/^(?:)/,/^(?:$)/],
-conditions: {"BOF":{"rules":[2,6,21,22,23,24,25,26],"inclusive":true},"COLUMNS":{"rules":[2,3,4,5,6,21,23,24,26],"inclusive":true},"COLUMN_DECLARATION":{"rules":[0,1,2,6,21,23,24,26],"inclusive":true},"PROPERTY_NAME":{"rules":[2,6,20,21,23,24,26],"inclusive":true},"PROPERTY_VALUE":{"rules":[2,6,13,14,15,16,17,18,19,21,23,24,26],"inclusive":true},"REGION_DECLARATION":{"rules":[2,6,8,9,10,21,23,24,26],"inclusive":true},"REGION_NUMBER":{"rules":[2,6,11,21,23,24,26],"inclusive":true},"REGION_END":{"rules":[2,6,7,21,23,24,26],"inclusive":true},"DATA":{"rules":[2,6,12,21,23,24,26],"inclusive":true},"INITIAL":{"rules":[2,6,21,23,24,26],"inclusive":true}}
+rules: [/^(?:)/,/^(?:[_A-Za-z][A-Za-z0-9]+)/,/^(?:['].+?['])/,/^(?:["].+?["])/,/^(?:\nColumns\b)/,/^(?:\nData\n+?(?=\n))/,/^(?:\nRegion[\s]+[0-9]+)/,/^(?:\nRegion\b)/,/^(?:[-]?[0-9]+[.][0-9]+)/,/^(?:[0-9]+(?![.]))/,/^(?:\()/,/^(?:\))/,/^(?:,)/,/^(?:\n)/,/^(?:\s)/,/^(?:$)/],
+conditions: {"BOF":{"rules":[0,1,2,3,4,5,7,8,9,10,11,12,13,14,15],"inclusive":true},"REGION":{"rules":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"inclusive":true},"INITIAL":{"rules":[1,2,3,4,5,7,8,9,10,11,12,13,14,15],"inclusive":true}}
 });
 return lexer;
 })();

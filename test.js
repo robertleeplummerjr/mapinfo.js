@@ -7,6 +7,6 @@ fs.readFile('example.mif', 'utf8', function (err, data) {
     return console.log(err);
   }
   data = data.replace(/\r/g, '');
-  console.log(mif.parse(data));
+  console.log(JSON.stringify(mif.parse(data)));
   process.exit();
 });

@@ -4,99 +4,59 @@
 %lex
 
 /* lexical states */
-%s BOF COLUMNS COLUMN_DECLARATION PROPERTY_NAME PROPERTY_VALUE REGION_DECLARATION REGION_NUMBER REGION_END DATA
+%s BOF REGION
 
 /*begin lexing */
 %%
 
-/* COLUMN HANDLING */
-<COLUMN_DECLARATION>[\s\n]+ {/**/}
-<COLUMN_DECLARATION>[A-Za-z]+([\(][0-9]+[\)])? {
-  this.popState();
-  return 'COLUMN_TYPE';
-}
-<COLUMNS>'Data' {
-  this.popState();
-  this.begin('DATA');
-}
-<COLUMNS>[0-9]+ {
-  return 'COLUMN_NUMBER';
-}
-<COLUMNS>\n\s+ {/**/}
-<COLUMNS>[_A-Za-z][A-Za-z0-9_]+(?=[\s]+) {
-  this.begin('COLUMN_DECLARATION');
-  return 'COLUMN_NAME';
-}
-'Columns'[\s](?=[0-9]+) {
-  this.begin('COLUMNS');
-}
-
-<REGION_END>[0-9]+ {
-  this.popState();
-  return 'REGION END';
-}
-<REGION_DECLARATION>'Region'[\s]+(?=[0-9]+[\n]) {
-  this.popState();
-  this.begin('REGION_END');
-}
-<REGION_DECLARATION>[-]?[0-9]+[.]?[0-9]*[ ][-]?[0-9]+[.]?[0-9]*(?=[\s\n]) {
-  return 'LON_LAT';
-}
-<REGION_DECLARATION>[_A-Za-z0-9\s\(\),-](?=\n) {
-  return 'REGION_PROPERTY';
-}
-<REGION_NUMBER>[0-9]+ {
-  this.popState();
-  this.begin('REGION_DECLARATION');
-  return 'REGION_NUMBER';
-}
-<DATA>'Region'[\s](?=[0-9]+) {
-  this.begin('REGION_NUMBER');
-}
-<PROPERTY_VALUE>[\s] {/**/}
-<PROPERTY_VALUE>['][A-Za-z,0-9_\s]+[']?(?=[\n]) {
-  this.popState();
-  return 'PROPERTY_VALUE';
-}
-<PROPERTY_VALUE>["][A-Za-z,0-9_\s]+["]?(?=[\n]) {
-  this.popState();
-  return 'PROPERTY_VALUE';
-}
-<PROPERTY_VALUE>[A-Za-z,0-9]+(?=[\n]) {
-  this.popState();
-  return 'PROPERTY_VALUE';
-}
-<PROPERTY_VALUE>['][A-Za-z,0-9_\s]+[']?(?![\n]) {
-  return 'PROPERTY_VALUE';
-}
-<PROPERTY_VALUE>["][A-Za-z,0-9_\s]+["]?(?![\n]) {
-  return 'PROPERTY_VALUE';
-}
-<PROPERTY_VALUE>[A-Za-z,0-9]+(?![\n]) {
-  return 'PROPERTY_VALUE';
-}
-<PROPERTY_NAME>[A-Za-z][A-Za-z0-9]+ {
-  console.log(yytext);
-  this.popState();
-  this.begin('PROPERTY_VALUE');
-  return 'PROPERTY_NAME'
-}
-[\n](?=[A-Za-z]) {
-   this.begin('PROPERTY_NAME');
-}
-<BOF>(?=[A-Za-z]) {
-  this.popState();
-  this.begin('PROPERTY_NAME');
-}
-
-\n {/**/}
-\s {/**/}
-
 <BOF> {
   //<BOF>
   this.popState();
-  return;
+  return 'NEW_LINE';
 }
+
+[_A-Za-z][A-Za-z0-9]+ {
+  return 'CONSTANT';
+}
+['].+?['] {
+  return 'STRING';
+}
+["].+?["] {
+  return 'STRING';
+}
+\n'Columns' {
+  return 'COLUMN_START';
+}
+\n'Data'\n+?(?=\n) {
+  return 'DATA_START';
+}
+<REGION>\n'Region'[\s]+[0-9]+ {
+  this.popState();
+  return 'REGION_END';
+}
+\n'Region' {
+  this.begin('REGION');
+  return 'REGION_START';
+}
+[-]?[0-9]+[.][0-9]+ {
+  return 'FLOAT';
+}
+[0-9]+(?![.]) {
+  return 'INTEGER';
+}
+"(" {
+  return 'LEFT_PARENTHESIS';
+}
+")" {
+  return 'RIGHT_PARENTHESIS';
+}
+"," {
+  return 'COMMA';
+}
+\n {
+  return 'NEW_LINE';
+}
+\s {/**/}
 
 <<EOF>> {
   //<<EOF>>
@@ -114,11 +74,11 @@
 %% /* language grammar */
 
 info
-  : properties columnDeclaration regions EOF {
+  : properties columns DATA_START regions EOF {
     return {
       properties: $1,
       columns: $2,
-      regions: $3
+      regions: $4
     };
   }
 	| EOF {
@@ -127,93 +87,160 @@ info
   ;
 
 properties
-  : properties PROPERTY_NAME propertyValues {
-    $1.push({
-      name: $2,
-      value: $3
-    });
-  }
-  | PROPERTY_NAME propertyValues {
+  : NEW_LINE CONSTANT propertyValues {
     $$ = [{
       name: $1,
       value: $2
     }];
   }
+  | properties NEW_LINE CONSTANT propertyValues {
+     $1.push({
+       name: $3,
+       value: $4
+     });
+   }
   ;
 
 propertyValues
-  : PROPERTY_VALUE
+  : STRING
   {
-    $$ = $1;
+    $$ = [$1];
   }
-  | propertyValues PROPERTY_VALUE {
-    if ($1 instanceof Array) {
-      $1.push($2);
-    } else {
-      $$ = [$1, $2];
-    }
+  | propertyValues COMMA STRING {
+    $1.push($3);
   }
-  ;
-
-columnDeclaration
-  : COLUMN_NUMBER columns {
-    $$ = {
-      index: $1,
-      columns: $2
-    };
+  | INTEGER {
+    $$ = [$1];
+  }
+  | propertyValues COMMA INTEGER {
+    $1.push($3);
+  }
+  | CONSTANT {
+    $$ = [$1];
+  }
+  | propertyValues CONSTANT {
+    $1.push($2);
+  }
+  | CONSTANT INTEGER {
+    $$ = [$1, $2];
+  }
+  | propertyValues CONSTANT INTEGER {
+    $1.push($2);
+    $1.push($3);
   }
   ;
 
 columns
-  : COLUMN_NAME COLUMN_TYPE {
-    $$ = [{
-      name: $1,
-      type: $2
-    }];
+  : COLUMN_START INTEGER columns {
+    $$ = $3;
   }
-  | columns COLUMN_NAME COLUMN_TYPE {
-    $1.push({
+  ;
+
+columns
+  : NEW_LINE CONSTANT CONSTANT {
+    $$ = [{
       name: $2,
       type: $3
+    }];
+  }
+  | columns NEW_LINE CONSTANT CONSTANT {
+    $1.push({
+      name: $3,
+      type: $4
+    });
+  }
+  | NEW_LINE CONSTANT CONSTANT LEFT_PARENTHESIS INTEGER RIGHT_PARENTHESIS {
+    $$ = [{
+      name: $2,
+      type: $3,
+      definition: $5
+    }];
+  }
+  | columns NEW_LINE CONSTANT CONSTANT LEFT_PARENTHESIS INTEGER RIGHT_PARENTHESIS {
+    $1.push({
+      name: $3,
+      type: $4,
+      definition: $6
     });
   }
   ;
 
 regions
-  : regions regionLines {
-    $1.push($2);
-  }
-  | REGION_NUMBER regionLines {
+  : REGION_START INTEGER regionLines REGION_END {
     $$ = [{
-      region: $1,
-      lines: $2
+      id: $2,
+      lines: $3
     }];
+  }
+  | regions REGION_START INTEGER regionLines REGION_END {
+    $1.push({
+      id: $3,
+      lines: $4
+    });
   }
   ;
 
 regionLines
-  : LON_LAT {
-    var parts = $1.split(' ');
+  : NEW_LINE INTEGER {
+    $$ = [$2];
+  }
+  | regionLines NEW_LINE INTEGER {
+    $1.push($3);
+  }
+  | NEW_LINE FLOAT FLOAT {
     $$ = [{
-      lon: parts[0],
-      lat: parts[1]
+      lon: $2,
+      lat: $3
     }];
   }
-  | regionLines LON_LAT {
-    var parts = $2.split(' ');
+  | regionLines NEW_LINE FLOAT FLOAT {
     $1.push({
-      lon: parts[0],
-      lat: parts[1]
+      lon: $3,
+      lat: $4
     });
   }
-  | REGION_PROPERTY {
-    $$ = [$1];
+  | NEW_LINE CONSTANT LEFT_PARENTHESIS args RIGHT_PARENTHESIS {
+    $$ = [{
+      key: $2,
+      args: $4
+    }];
   }
-  | regionLines REGION_PROPERTY {
-    $1.push($2);
+  | regionLines NEW_LINE CONSTANT LEFT_PARENTHESIS args RIGHT_PARENTHESIS {
+    $1.push({
+      key: $3,
+      value: $5
+    });
+  }
+  | NEW_LINE CONSTANT FLOAT FLOAT {
+    $$ = [{
+      key: $2,
+      lat: $3,
+      lon: $4
+    }];
+  }
+  | regionLines NEW_LINE CONSTANT FLOAT FLOAT {
+    $1.push({
+      key: $3,
+      lat: $4,
+      lon: $5
+    });
   }
   ;
 
+args
+  : FLOAT {
+    $$ = [$1];
+  }
+  | args COMMA FLOAT {
+    $1.push($3);
+  }
+  | INTEGER {
+    $$ = [$1];
+  }
+  | args COMMA INTEGER {
+    $1.push($3);
+  }
+  ;
 %%
 if (typeof GLOBAL !== 'undefined') {
   GLOBAL.window = GLOBAL;
