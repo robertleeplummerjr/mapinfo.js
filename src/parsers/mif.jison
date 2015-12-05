@@ -288,38 +288,16 @@ args
   }
   ;
 %%
-if (typeof GLOBAL !== 'undefined') {
-  GLOBAL.window = GLOBAL;
-}
-if (typeof window.MID === 'undefined') {
-  var parse = parser.parse;
-  parser.parse = function(input) {
-    var setInput = this.lexer.setInput;
-    this.lexer.setInput = function(input) {
-      setInput.call(this, input);
-      this.begin('BOF');
-      return this;
-    };
 
-    this.parse = parse;
-    return parse.call(this, input);
+var parse = parser.parse;
+parser.parse = function(input) {
+  var setInput = this.lexer.setInput;
+  this.lexer.setInput = function(input) {
+    setInput.call(this, input);
+    this.begin('BOF');
+    return this;
   };
 
-	window.MIF = function(handler) {
-		var MIFLexer = function () {};
-		MIFLexer.prototype = parser.lexer;
-
-		var MIFParser = function () {
-			this.lexer = new MIFLexer();
-			this.yy = {};
-		};
-
-		MIFParser.prototype = parser;
-		var newParser = new MIFParser;
-		newParser.setObj = function(obj) {
-			newParser.yy.obj = obj;
-		};
-		newParser.yy.handler = handler;
-		return newParser;
-	};
-}
+  this.parse = parse;
+  return parse.call(this, input);
+};

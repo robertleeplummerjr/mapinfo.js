@@ -17,12 +17,12 @@ var MapInfo = (function() {
     parseMid: function() {
       /*mid*/var parser;/**/
 
-      return this.mid = parser.parse(this.midString);
+      return this.mid = parser.parse(this.midString.replace(/\r/g, ''));
     },
     parseMif: function() {
       /*mif*/var parser;/**/
 
-      return this.mif = parser.parse(this.mifString);
+      return this.mif = parser.parse(this.mifString.replace(/\r/g, ''));
     },
     toGeoJSON: function() {
       this.parse();

@@ -3,10 +3,8 @@ var mif = require('./src/parsers/mif.js')
   ;
 
 fs.readFile('example.mif', 'utf8', function (err, data) {
-  if (err) {
-    return console.log(err);
-  }
-  data = data.replace(/\r/g, '');
-  console.log(JSON.stringify(mif.parse(data)));
+  if (err) throw err;
+
+  console.log(JSON.stringify(mif.parse(data.replace(/\r/g, ''))));
   process.exit();
 });

@@ -3,10 +3,8 @@ var mid = require('./src/parsers/mid.js')
   ;
 
 fs.readFile('example.mid', 'utf8', function (err, data) {
-  if (err) {
-    return console.log(err);
-  }
-  data = data.replace(/\r/g, '');
-  console.log(JSON.stringify(mid.parse(data)));
+  if (err) throw err;
+
+  console.log(JSON.stringify(mid.parse(data.replace(/\r/g, ''))));
   process.exit();
 });
