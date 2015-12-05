@@ -14,13 +14,15 @@ var MapInfo = (function() {
           .parseMif();
     },
     parseMid: function() {
-      var parser = 'MID_PARSER';
+      /*mid*/var parser;/**/
+
       this.mid = parser.parse(this.midString);
 
       return this;
     },
     parseMif: function() {
-      var parser = 'MIF_PARSER';
+      /*mif*/var parser;/**/
+
       this.mif = parser.parse(this.mifString);
 
       return this;
@@ -77,4 +79,4 @@ var MapInfo = (function() {
   return MapInfo;
 })();
 
-module.exports = MapInfo;
+if (typeof module !== 'undefined') module.exports = MapInfo;
