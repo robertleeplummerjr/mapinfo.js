@@ -1,4 +1,4 @@
-/* description: Parses a tab separated value to an array */
+/* description: Parses a mapinfo mif file to an object */
 
 /* lexical grammar */
 %lex

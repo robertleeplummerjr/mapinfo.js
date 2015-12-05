@@ -48,7 +48,7 @@ var MapInfo = (function() {
         properties = getGeoJsonProperties(this, i);
         for (j = 0; j < jMax; j++) {
           line = lines[j];
-          if (line.hasOwnProperty('lon') && line.hasOwnProperty('lan')) {
+          if (line.hasOwnProperty('lon') && line.hasOwnProperty('lat')) {
             coordinates.push([line.lon, line.lat]);
           }
         }

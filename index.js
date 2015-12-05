@@ -1603,7 +1603,7 @@ if (typeof module !== 'undefined' && require.main === module) {
       ;
 
     for (; i < max; i++) {
-      properties[columns[i].name] = midRow[i];
+      properties[columns[i]] = midRow[i];
     }
 
     return properties;
@@ -1620,10 +1620,10 @@ if (typeof module !== 'undefined' && require.main === module) {
     }
   }
 
-  function newGeoJson(features) {
+  function newGeoJson() {
     return {
       type: "FeatureCollection",
-      features: features
+      features: []
     }
   }
 
