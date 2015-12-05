@@ -64,9 +64,6 @@
 \s {/**/}
 
 <<EOF>> {
-  //<<EOF>>
-  //this.popState();
-  //lexer.yy.conditionStack = [];
   return 'EOF';
 }
 
@@ -94,44 +91,52 @@ info
 properties
   : NEW_LINE CONSTANT propertyValues {
     $$ = [{
-      name: $1,
-      value: $2
+      name: $2,
+      value: $3
     }];
   }
   | properties NEW_LINE CONSTANT propertyValues {
-     $1.push({
-       name: $3,
-       value: $4
-     });
-   }
+    $1.push({
+      name: $3,
+      value: $4
+    });
+  }
+  | NEW_LINE CONSTANT CONSTANT propertyValues {
+    $$ = [{
+      name: $2 + ' ' + $3,
+      value: $4
+    }];
+  }
+  | properties NEW_LINE CONSTANT CONSTANT propertyValues {
+    $1.push({
+      name: $3 + ' ' + $4,
+      value: $5
+    });
+  }
+  | NEW_LINE CONSTANT CONSTANT CONSTANT propertyValues {
+    $1.push({
+      name: $2 + ' ' + $3 + ' ' + $4,
+      value: $5
+    });
+  }
+  | properties NEW_LINE CONSTANT CONSTANT CONSTANT propertyValues {
+    $1.push({
+      name: $3 + ' ' + $4 + ' ' + $5,
+      value: $6
+    });
+  }
   ;
 
 propertyValues
   : STRING
   {
-    $$ = [$1];
-  }
-  | propertyValues COMMA STRING {
-    $1.push($3);
+    $$ = $1;
   }
   | INTEGER {
-    $$ = [$1];
+    $$ = $1;
   }
-  | propertyValues COMMA INTEGER {
-    $1.push($3);
-  }
-  | CONSTANT {
-    $$ = [$1];
-  }
-  | propertyValues CONSTANT {
-    $1.push($2);
-  }
-  | CONSTANT INTEGER {
-    $$ = [$1, $2];
-  }
-  | propertyValues CONSTANT INTEGER {
-    $1.push($2);
-    $1.push($3);
+  | INTEGER COMMA INTEGER {
+    $$ = [$1, $3];
   }
   ;
 

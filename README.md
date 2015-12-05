@@ -15,14 +15,14 @@ var mapInfo = new MapInfo({
 ## Basic MID File Usage
 ```javascript
 var mapInfo = new MapInfo({midString: midString})
-  , mid = mapInfo.parseMid()
+  , mid     = mapInfo.parseMid()
   ;
 ```
 
 ## Basic MIF File Usage
 ```javascript
 var mapInfo = new MapInfo({mifString: mifString})
-  , mif = mapInfo.parseMif()
+  , mif     = mapInfo.parseMif()
   ;
 ```
 

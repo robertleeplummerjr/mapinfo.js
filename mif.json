@@ -1,26 +1,20 @@
 {
   "properties": [
     {
-      "name": "",
-      "value": "Version"
+      "name": "Version",
+      "value": "400"
     },
     {
       "name": "Charset",
-      "value": [
-        "WindowsLatin1"
-      ]
+      "value": "WindowsLatin1"
     },
     {
       "name": "Delimiter",
-      "value": [
-        ","
-      ]
+      "value": ","
     },
     {
-      "name": "CoordSys",
+      "name": "CoordSys Earth Projection",
       "value": [
-        "Earth",
-        "Projection",
         "1",
         "62"
       ]
