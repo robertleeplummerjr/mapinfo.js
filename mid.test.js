@@ -1,4 +1,4 @@
-var mid = require('./mid.js')
+var mid = require('./src/parsers/mid.js')
   , fs  = require('fs')
   ;
 

@@ -1,4 +1,4 @@
-var mif = require('./mif.js')
+var mif = require('./src/parsers/mif.js')
   , fs  = require('fs')
   ;
 
