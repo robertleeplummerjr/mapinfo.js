@@ -10,7 +10,6 @@
 %%
 
 <BOF> {
-  //<BOF>
   this.popState();
   return 'NEW_LINE';
 }
@@ -19,9 +18,11 @@
   return 'CONSTANT';
 }
 ['].+?['] {
+  yytext = yytext.substring(1, yytext.length - 1);
   return 'STRING';
 }
 ["].+?["] {
+  yytext = yytext.substring(1, yytext.length - 1);
   return 'STRING';
 }
 \n'Columns' {
@@ -30,7 +31,11 @@
 \n'Data'\n+?(?=\n) {
   return 'DATA_START';
 }
-<REGION>\n'Region'[\s]+[0-9]+ {
+<REGION>\n(?=<<EOF>>) {
+  this.popState();
+  return 'REGION_END';
+}
+<REGION>(?=\n'Region'[\s]+[0-9]+) {
   this.popState();
   return 'REGION_END';
 }
@@ -41,7 +46,7 @@
 [-]?[0-9]+[.][0-9]+ {
   return 'FLOAT';
 }
-[0-9]+(?![.]) {
+[-]?[0-9]+(?![.]) {
   return 'INTEGER';
 }
 "(" {
@@ -194,6 +199,42 @@ regionLines
     }];
   }
   | regionLines NEW_LINE FLOAT FLOAT {
+    $1.push({
+      lon: $3,
+      lat: $4
+    });
+  }
+  | NEW_LINE FLOAT INTEGER {
+    $$ = [{
+      lon: $2,
+      lat: $3
+    }];
+  }
+  | regionLines NEW_LINE FLOAT INTEGER {
+    $1.push({
+      lon: $3,
+      lat: $4
+    });
+  }
+  | NEW_LINE INTEGER FLOAT {
+    $$ = [{
+      lon: $2,
+      lat: $3
+    }];
+  }
+  | regionLines NEW_LINE INTEGER FLOAT {
+    $1.push({
+      lon: $3,
+      lat: $4
+    });
+  }
+  | NEW_LINE INTEGER INTEGER {
+    $$ = [{
+      lon: $2,
+      lat: $3
+    }];
+  }
+  | regionLines NEW_LINE INTEGER INTEGER {
     $1.push({
       lon: $3,
       lat: $4

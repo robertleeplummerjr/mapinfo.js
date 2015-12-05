@@ -72,12 +72,12 @@
   }
 */
 var parser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[1,8],$V2=[1,9],$V3=[1,10],$V4=[5,7],$V5=[1,13],$V6=[1,14],$V7=[5,7,9,10],$V8=[1,15],$V9=[5,7,9,10,11,13];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,8],$V1=[1,9],$V2=[1,10],$V3=[5,6],$V4=[1,12],$V5=[5,6,9];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"grid":3,"rows":4,"EOF":5,"row":6,"END_OF_LINE":7,"string":8,"COLUMN_EMPTY":9,"COLUMN_STRING":10,"CHAR":11,"QUOTE_ON":12,"QUOTE_OFF":13,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",7:"END_OF_LINE",9:"COLUMN_EMPTY",10:"COLUMN_STRING",11:"CHAR",12:"QUOTE_ON",13:"QUOTE_OFF"},
-productions_: [0,[3,2],[3,1],[4,1],[4,1],[4,2],[4,3],[6,1],[6,1],[6,2],[6,3],[6,1],[6,2],[6,3],[8,1],[8,2],[8,3]],
+symbols_: {"error":2,"grid":3,"rows":4,"EOF":5,"NEW_LINE":6,"columns":7,"STRING":8,"COMMA":9,"CONSTANT":10,"INTEGER":11,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",6:"NEW_LINE",8:"STRING",9:"COMMA",10:"CONSTANT",11:"INTEGER"},
+productions_: [0,[3,2],[3,1],[4,2],[4,3],[7,1],[7,3],[7,1],[7,3],[7,1],[7,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -90,101 +90,33 @@ case 1:
 break;
 case 2:
 
-		return [['']];
+		return [[]];
 	
 break;
 case 3:
 
-    //row
 		this.$ = [$$[$0]];
 	
 break;
-case 4:
+case 4: case 6:
 
-    //END_OF_LINE
-    this.$ = [];
-	
-break;
-case 5:
-
-    //rows END_OF_LINE
-    this.$ = $$[$0-1];
-  
-break;
-case 6:
-
-    //rows END_OF_LINE row
     $$[$0-2].push($$[$0]);
-    this.$ = $$[$0-2];
   
 break;
-case 7:
+case 5: case 7: case 9:
 
-    //string
-		this.$ = [$$[$0].join('')];
-	
-break;
-case 8:
-
-    //COLUMN_EMPTY
-		this.$ = [''];
-	
-break;
-case 9:
-
-    //row COLUMN_EMPTY
-    $$[$0-1].push('');
-    this.$ = $$[$0-1];
+    this.$ = [$$[$0]];
   
 break;
-case 10:
+case 8: case 10:
 
-    //row COLUMN_EMPTY string
-    $$[$0-2].push('');
-    $$[$0-2].push($$[$0].join(''));
-    this.$ = $$[$0-2];
-  
-break;
-case 11:
-
-    //COLUMN_STRING
-  
-break;
-case 12:
-
-    //row COLUMN_STRING
-  
-break;
-case 13:
-
-    //row COLUMN_STRING string
-    $$[$0-2].push($$[$0].join(''));
-    this.$ = $$[$0-2];
-  
-break;
-case 14:
-
-    //CHAR
-		this.$ = [$$[$0]];
-	
-break;
-case 15:
-
-    //string CHAR
-		$$[$0-1].push($$[$0]);
-		this.$ = $$[$0-1];
-	
-break;
-case 16:
-
-    //QUOTE_ON string QUOTE_OFF
-    this.$ = $$[$0-1];
+    $$[$0-2].push($$[$0])
   
 break;
 }
 },
-table: [{3:1,4:2,5:[1,3],6:4,7:[1,5],8:6,9:$V0,10:$V1,11:$V2,12:$V3},{1:[3]},{5:[1,11],7:[1,12]},{1:[2,2]},o($V4,[2,3],{9:$V5,10:$V6}),o($V4,[2,4]),o($V7,[2,7],{11:$V8}),o($V7,[2,8]),o($V7,[2,11]),o($V9,[2,14]),{8:16,11:$V2,12:$V3},{1:[2,1]},o($V4,[2,5],{8:6,6:17,9:$V0,10:$V1,11:$V2,12:$V3}),o($V7,[2,9],{8:18,11:$V2,12:$V3}),o($V7,[2,12],{8:19,11:$V2,12:$V3}),o($V9,[2,15]),{11:$V8,13:[1,20]},o($V4,[2,6],{9:$V5,10:$V6}),o($V7,[2,10],{11:$V8}),o($V7,[2,13],{11:$V8}),o($V9,[2,16])],
-defaultActions: {3:[2,2],11:[2,1]},
+table: [{3:1,4:2,5:[1,3],6:[1,4]},{1:[3]},{5:[1,5],6:[1,6]},{1:[2,2]},{7:7,8:$V0,10:$V1,11:$V2},{1:[2,1]},{7:11,8:$V0,10:$V1,11:$V2},o($V3,[2,3],{9:$V4}),o($V5,[2,5]),o($V5,[2,7]),o($V5,[2,9]),o($V3,[2,4],{9:$V4}),{8:[1,13],10:[1,14],11:[1,15]},o($V5,[2,6]),o($V5,[2,8]),o($V5,[2,10])],
+defaultActions: {3:[2,2],5:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -693,91 +625,50 @@ performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
 case 0:
-  //<QUOTE>(\n|"\n")
-  return 11;
+  this.popState();
+  return 6;
 
 break;
 case 1:
-  //<QUOTE>([\'\"])(?=<<EOF>>)
-  this.popState();
-  return 13;
+  return 10;
 
 break;
 case 2:
-  //<QUOTE>([\'\"])
-  if (yy_.yytext == this.quoteChar) {
-    this.popState();
-    this.begin('STRING');
-    return 13;
-	} else {
-    return 11;
-	}
+  yy_.yytext = yy_.yytext.substring(1, yy_.yytext.length - 1);
+  return 8;
 
 break;
 case 3:
-  //<BOF>([\'\"])
-  this.popState();
-  this.quoteChar = yy_.yytext.substring(0);
-	this.begin('QUOTE');
-	return 12;
+  yy_.yytext = yy_.yytext.substring(1, yy_.yytext.length - 1);
+  return 8;
 
 break;
 case 4:
-  //<PRE_QUOTE>([\'\"])
-  this.quoteChar = yy_.yytext;
-  this.popState();
-	this.begin('QUOTE');
-	return 12;
+  return 11;
 
 break;
 case 5:
-  //(\n|"\n")(?=[\'\"])
-	this.begin('PRE_QUOTE');
-	return 7;
+  return 5;
 
 break;
 case 6:
-  //<QUOTE>([a-zA-Z0-9_]+|.)
-  return 11;
+  return 6;
 
 break;
 case 7:
-  //<STRING>(\n|"\n")
-	this.popState();
-	return 7;
+  return 9;
 
 break;
-case 8:
-  //<STRING>([a-zA-Z0-9_ ]+|.)
-  return 11;
-
+case 8:/**/
 break;
 case 9:
-  //<BOF>
-  this.popState();
-
-break;
-case 10:
-  //(\n)
-  return 7;
-
-break;
-case 11:
-  //([a-zA-Z0-9_ ]+|.)
-	this.begin('STRING');
-	return 11;
-
-break;
-case 12:
-  //<<EOF>>
-  //lexer.yy.conditionStack = [];
   return 5;
 
 break;
 }
 },
-rules: [/^(?:(\n|\\n))/,/^(?:([\'\"])(?=$))/,/^(?:([\'\"]))/,/^(?:([\'\"]))/,/^(?:([\'\"]))/,/^(?:(\n|\\n)(?=[\'\"]))/,/^(?:([a-zA-Z0-9_ ]+|.))/,/^(?:(\n|\\n))/,/^(?:([a-zA-Z0-9_ ]+|.))/,/^(?:)/,/^(?:(\n))/,/^(?:([a-zA-Z0-9_ ]+|.))/,/^(?:$)/],
-conditions: {"BOF":{"rules":[3,5,9,10,11,12],"inclusive":true},"PRE_QUOTE":{"rules":[4,5,10,11,12],"inclusive":true},"QUOTE":{"rules":[0,1,2,5,6,10,11,12],"inclusive":true},"STRING":{"rules":[5,7,8,10,11,12],"inclusive":true},"INITIAL":{"rules":[5,10,11,12],"inclusive":true}}
+rules: [/^(?:)/,/^(?:[_A-Za-z][A-Za-z0-9]+)/,/^(?:['].+?['])/,/^(?:["].+?["])/,/^(?:[-]?[0-9]+(?![.]))/,/^(?:\n$)/,/^(?:\n)/,/^(?:,)/,/^(?:\s)/,/^(?:$)/],
+conditions: {"BOF":{"rules":[0,1,2,3,4,5,6,7,8,9],"inclusive":true},"INITIAL":{"rules":[1,2,3,4,5,6,7,8,9],"inclusive":true}}
 });
 return lexer;
 })();

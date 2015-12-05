@@ -4,84 +4,41 @@
 %lex
 
 /* lexical states */
-%s BOF PRE_QUOTE QUOTE STRING
+%s BOF
 
 /*begin lexing */
 %%
 
-/* quote handling */
-<QUOTE>(\n|"\n") {
-  //<QUOTE>(\n|"\n")
-  return 'CHAR';
-}
-<QUOTE>([\'\"])(?=<<EOF>>) {
-  //<QUOTE>([\'\"])(?=<<EOF>>)
-  this.popState();
-  return 'QUOTE_OFF';
-}
-<QUOTE>([\'\"]) {
-  //<QUOTE>([\'\"])
-  if (yytext == this.quoteChar) {
-    this.popState();
-    this.begin('STRING');
-    return 'QUOTE_OFF';
-	} else {
-    return 'CHAR';
-	}
-}
-<BOF>([\'\"]) {
-  //<BOF>([\'\"])
-  this.popState();
-  this.quoteChar = yytext.substring(0);
-	this.begin('QUOTE');
-	return 'QUOTE_ON';
-}
-<PRE_QUOTE>([\'\"]) {
-  //<PRE_QUOTE>([\'\"])
-  this.quoteChar = yytext;
-  this.popState();
-	this.begin('QUOTE');
-	return 'QUOTE_ON';
-}
-
-(\n|"\n")(?=[\'\"]) {
-  //(\n|"\n")(?=[\'\"])
-	this.begin('PRE_QUOTE');
-	return 'END_OF_LINE';
-}
-<QUOTE>([a-zA-Z0-9_ ]+|.) {
-  //<QUOTE>([a-zA-Z0-9_]+|.)
-  return 'CHAR';
-}
-/* end quote handling */
-
-
-/*spreadsheet control characters*/
-<STRING>(\n|"\n") {
-  //<STRING>(\n|"\n")
-	this.popState();
-	return 'END_OF_LINE';
-}
-<STRING>([a-zA-Z0-9_ ]+|.) {
-  //<STRING>([a-zA-Z0-9_ ]+|.)
-  return 'CHAR';
-}
 <BOF> {
-  //<BOF>
   this.popState();
+  return 'NEW_LINE';
 }
-(\n) {
-  //(\n)
-  return 'END_OF_LINE';
+
+[_A-Za-z][A-Za-z0-9]+ {
+  return 'CONSTANT';
 }
-([a-zA-Z0-9_ ]+|.) {
-  //([a-zA-Z0-9_ ]+|.)
-	this.begin('STRING');
-	return 'CHAR';
+['].+?['] {
+  yytext = yytext.substring(1, yytext.length - 1);
+  return 'STRING';
 }
+["].+?["] {
+  yytext = yytext.substring(1, yytext.length - 1);
+  return 'STRING';
+}
+[-]?[0-9]+(?![.]) {
+  return 'INTEGER';
+}
+\n<<EOF>> {
+  return 'EOF';
+}
+\n {
+  return 'NEW_LINE';
+}
+"," {
+  return 'COMMA';
+}
+\s {/**/}
 <<EOF>> {
-  //<<EOF>>
-  //lexer.yy.conditionStack = [];
   return 'EOF';
 }
 
@@ -93,87 +50,44 @@
 
 %% /* language grammar */
 
-grid :
-	rows EOF {
+grid
+  : rows EOF {
 		return $1;
 	}
 	| EOF {
-		return [['']];
+		return [[]];
 	}
-;
+  ;
 
-rows :
-	row {
-    //row
-		$$ = [$1];
+rows
+  : NEW_LINE columns {
+		$$ = [$2];
 	}
-	| END_OF_LINE {
-    //END_OF_LINE
-    $$ = [];
-	}
-  | rows END_OF_LINE {
-    //rows END_OF_LINE
-    $$ = $1;
-  }
-  | rows END_OF_LINE row {
-    //rows END_OF_LINE row
+	| rows NEW_LINE columns {
     $1.push($3);
-    $$ = $1;
   }
-;
+  ;
 
-row :
-	string {
-    //string
-		$$ = [$1.join('')];
-	}
-
-  //scenario where we have an empty column, which needs treated like a ''
-	| COLUMN_EMPTY {
-    //COLUMN_EMPTY
-		$$ = [''];
-	}
-  | row COLUMN_EMPTY {
-    //row COLUMN_EMPTY
-    $1.push('');
-    $$ = $1;
+columns
+  : STRING {
+    $$ = [$1];
   }
-  | row COLUMN_EMPTY string {
-    //row COLUMN_EMPTY string
-    $1.push('');
-    $1.push($3.join(''));
-    $$ = $1;
+  | columns COMMA STRING {
+    $1.push($3);
   }
-
-  //scenario where we have 2 values separated by a column, in this case the column is ignored
-  | COLUMN_STRING {
-    //COLUMN_STRING
+  | CONSTANT {
+    $$ = [$1];
   }
-  | row COLUMN_STRING {
-    //row COLUMN_STRING
+  | columns COMMA CONSTANT {
+    $1.push($3)
   }
-  | row COLUMN_STRING string {
-    //row COLUMN_STRING string
-    $1.push($3.join(''));
-    $$ = $1;
+  | INTEGER {
+    $$ = [$1];
   }
-;
-
-string :
-	CHAR {
-    //CHAR
-		$$ = [$1];
-	}
-	| string CHAR {
-    //string CHAR
-		$1.push($2);
-		$$ = $1;
-	}
-	| QUOTE_ON string QUOTE_OFF {
-    //QUOTE_ON string QUOTE_OFF
-    $$ = $2;
+  | columns COMMA INTEGER {
+    $1.push($3)
   }
-;
+  ;
 
 %%
 if (typeof GLOBAL !== 'undefined') {
