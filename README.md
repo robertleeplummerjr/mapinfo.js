@@ -17,14 +17,14 @@ var mapInfo = new MapInfo({
 var mapInfo = new MapInfo({midString: midString})
   , mid = mapInfo.parseMid()
   ;
-``
+```
 
 ## Basic MIF File Usage
 ```javascript
 var mapInfo = new MapInfo({mifString: mifString})
   , mif = mapInfo.parseMif()
   ;
-``
+```
 
 ## MID JSON
 ```javascript

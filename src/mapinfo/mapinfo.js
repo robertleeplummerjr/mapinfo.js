@@ -1,31 +1,28 @@
 var MapInfo = (function() {
 
-  function MapInfo(midString, mifString) {
-    this.midString = midString;
+  function MapInfo(settings) {
+    settings = settings || {};
+    this.midString = settings.midString;
     this.mid = null;
-    this.mifString = mifString;
+    this.mifString = settings.mifString;
     this.mif = null;
   }
 
   MapInfo.prototype = {
     parse: function() {
-      return this
-          .parseMid()
-          .parseMif();
+      this.parseMid();
+      this.parseMif();
+      return this;
     },
     parseMid: function() {
       /*mid*/var parser;/**/
 
-      this.mid = parser.parse(this.midString);
-
-      return this;
+      return this.mid = parser.parse(this.midString);
     },
     parseMif: function() {
       /*mif*/var parser;/**/
 
-      this.mif = parser.parse(this.mifString);
-
-      return this;
+      return this.mif = parser.parse(this.mifString);
     },
     toGeoJSON: function() {
       this.parse();
