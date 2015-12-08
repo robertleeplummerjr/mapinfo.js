@@ -85,10 +85,10 @@ var MapInfo = (function() {
     }
   }
 
-  function newGeoJson() {
+  function newGeoJson(features) {
     return {
       type: "FeatureCollection",
-      features: []
+      features: features
     }
   }
 

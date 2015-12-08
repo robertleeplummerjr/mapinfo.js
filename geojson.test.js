@@ -1,5 +1,5 @@
 var MapInfo = require('./index')
-  , fs  = require('fs')
+  , fs      = require('fs')
   ;
 
 fs.readFile('example.mid', 'utf8', function (err, midString) {
